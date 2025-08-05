@@ -44,6 +44,7 @@ export default function QuickLog() {
             }
             setNutritionData(formattedData)
         } catch (err: any) {
+            console.error('Error in handleAnalyze:', err)
             setError(err.message)
         } finally {
             setLoading(false)
