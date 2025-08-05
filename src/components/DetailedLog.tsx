@@ -10,8 +10,9 @@ interface NutritionData {
     fat: number
 }
 
-export default function QuickLog() {
-    const [description, setDescription] = useState('')
+export default function DetailedLog() {
+    const [batchDescription, setBatchDescription] = useState('')
+    const [portionDescription, setPortionDescription] = useState('')
     const [nutritionData, setNutritionData] = useState<NutritionData | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -21,13 +22,15 @@ export default function QuickLog() {
         setError(null)
         setNutritionData(null)
 
+        const fullDescription = `Batch: ${batchDescription}. My portion: ${portionDescription}`
+
         try {
             const response = await fetch('/api/analyze-meal', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ description }),
+                body: JSON.stringify({ description: fullDescription }),
             })
 
             if (!response.ok) {
@@ -52,14 +55,33 @@ export default function QuickLog() {
 
     return (
         <div className="p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center">Quick Log</h2>
-            <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="e.g., A bowl of oatmeal with a scoop of protein powder, a banana, and a handful of almonds"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                rows={4}
-            />
+            <h2 className="text-2xl font-bold text-center">Detailed Log</h2>
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Describe the entire batch of food you cooked
+                    </label>
+                    <textarea
+                        value={batchDescription}
+                        onChange={(e) => setBatchDescription(e.target.value)}
+                        placeholder="e.g., A large pot of chili with ground beef, beans, tomatoes, and various spices"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        rows={4}
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Describe the portion you ate
+                    </label>
+                    <textarea
+                        value={portionDescription}
+                        onChange={(e) => setPortionDescription(e.target.value)}
+                        placeholder="e.g., One medium-sized bowl"
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        rows={2}
+                    />
+                </div>
+            </div>
             <button
                 onClick={handleAnalyze}
                 disabled={loading}
