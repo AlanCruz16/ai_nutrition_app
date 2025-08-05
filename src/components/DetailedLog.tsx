@@ -1,13 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ResultsCard from './ResultsCard'
+import { createClient } from '@/lib/supabase/client'
 
 interface NutritionData {
     calories: number
     protein: number
     carbs: number
     fat: number
+}
+
+interface Recipe {
+    id: string
+    name: string
+    description: string
 }
 
 interface DetailedLogProps {
@@ -20,6 +27,33 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
     const [nutritionData, setNutritionData] = useState<NutritionData | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [showSaveRecipe, setShowSaveRecipe] = useState(false)
+    const [recipeName, setRecipeName] = useState('')
+    const [recipes, setRecipes] = useState<Recipe[]>([])
+    const supabase = createClient()
+
+    useEffect(() => {
+        const fetchRecipes = async () => {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser()
+
+            if (user) {
+                const { data, error } = await supabase
+                    .from('recipes')
+                    .select('*')
+                    .eq('user_id', user.id)
+
+                if (error) {
+                    console.error('Error fetching recipes:', error)
+                } else {
+                    setRecipes(data)
+                }
+            }
+        }
+
+        fetchRecipes()
+    }, [supabase])
 
     const handleAnalyze = async () => {
         setLoading(true)
@@ -59,13 +93,61 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
         }
     }
 
+    const handleSaveRecipe = async () => {
+        const {
+            data: { user },
+        } = await supabase.auth.getUser()
+
+        if (user) {
+            try {
+                const { data, error } = await supabase
+                    .from('recipes')
+                    .insert([{ name: recipeName, description: batchDescription, user_id: user.id }])
+                    .select()
+
+                if (error) {
+                    throw error
+                }
+
+                setRecipes([...recipes, data[0]])
+                setShowSaveRecipe(false)
+                setRecipeName('')
+            } catch (err: any) {
+                setError(err.message)
+            }
+        }
+    }
+
     return (
         <div className="p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center">Detailed Log</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-800">Detailed Log</h2>
             <div className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
-                        Describe the entire batch of food you cooked
+                        Select a saved recipe
+                    </label>
+                    <select
+                        onChange={(e) => {
+                            const selectedRecipe = recipes.find(
+                                (r) => r.id === e.target.value
+                            )
+                            if (selectedRecipe) {
+                                setBatchDescription(selectedRecipe.description)
+                            }
+                        }}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                    >
+                        <option value="">-- Select a recipe --</option>
+                        {recipes.map((recipe) => (
+                            <option key={recipe.id} value={recipe.id}>
+                                {recipe.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                        Or describe the entire batch of food you cooked
                     </label>
                     <textarea
                         value={batchDescription}
@@ -74,6 +156,29 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                         className="w-full p-2 border border-gray-300 rounded-md"
                         rows={4}
                     />
+                    <button
+                        onClick={() => setShowSaveRecipe(true)}
+                        className="w-full px-4 py-2 mt-2 font-bold text-white bg-purple-600 rounded-md hover:bg-purple-700"
+                    >
+                        Save as Recipe
+                    </button>
+                    {showSaveRecipe && (
+                        <div className="mt-2">
+                            <input
+                                type="text"
+                                value={recipeName}
+                                onChange={(e) => setRecipeName(e.target.value)}
+                                placeholder="Recipe Name"
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                            />
+                            <button
+                                onClick={handleSaveRecipe}
+                                className="w-full px-4 py-2 mt-2 font-bold text-white bg-green-600 rounded-md hover:bg-green-700"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -101,7 +206,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
             {nutritionData && (
                 <ResultsCard
                     data={nutritionData}
-                    description={`Batch: ${batchDescription}. My portion: ${portionDescription}`}
+                    description={`Batch: ${batchDescription}\nMy portion: ${portionDescription}`}
                 />
             )}
         </div>

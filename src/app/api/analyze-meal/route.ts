@@ -45,11 +45,11 @@ export async function POST(req: NextRequest) {
       if (!secondJsonMatch || !secondJsonMatch[0]) {
         throw new Error('Invalid JSON response from AI');
       }
-      const jsonString = secondJsonMatch[0].trim();
+      const jsonString = secondJsonMatch[0].trim().replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
       const data = JSON.parse(jsonString);
       return NextResponse.json(data)
     }
-    const jsonString = jsonMatch[1].trim();
+    const jsonString = jsonMatch[1].trim().replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
     const data = JSON.parse(jsonString);
 
     return NextResponse.json(data)

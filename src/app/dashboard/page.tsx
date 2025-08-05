@@ -55,7 +55,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchMealLogs()
-    }, [])
+    }, [supabase])
 
     return (
         <div className="relative flex flex-col items-center min-h-screen bg-gray-100 py-12">
@@ -93,6 +93,8 @@ export default function Dashboard() {
                     mealLogs={mealLogs}
                     loading={loading}
                     error={error}
+                    onMealDeleted={fetchMealLogs}
+                    supabase={supabase}
                 />
             </div>
         </div>

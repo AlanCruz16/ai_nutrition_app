@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
 import UserNav from '@/components/UserNav'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface MealLog {
     id: string
@@ -21,6 +22,7 @@ export default function Profile() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const supabase = createClient()
+    const router = useRouter()
 
     useEffect(() => {
         const fetchMealLogs = async () => {
@@ -72,6 +74,27 @@ export default function Profile() {
             )
     }, [mealLogs])
 
+    const weeklySummary = useMemo(() => {
+        const today = new Date()
+        const startOfWeek = new Date(today)
+        startOfWeek.setDate(today.getDate() - today.getDay())
+        return mealLogs
+            .filter((log) => {
+                const logDate = new Date(log.created_at)
+                return logDate >= startOfWeek
+            })
+            .reduce(
+                (acc, log) => {
+                    acc.calories += log.calories
+                    acc.protein += log.protein
+                    acc.carbs += log.carbs
+                    acc.fat += log.fat
+                    return acc
+                },
+                { calories: 0, protein: 0, carbs: 0, fat: 0 }
+            )
+    }, [mealLogs])
+
     const macroData = [
         { name: 'Protein', value: dailySummary.protein },
         { name: 'Carbs', value: dailySummary.carbs },
@@ -86,6 +109,11 @@ export default function Profile() {
 
     if (error) {
         return <p className="text-red-500">{error}</p>
+    }
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut()
+        router.push('/login')
     }
 
     return (
@@ -103,6 +131,13 @@ export default function Profile() {
                         <p>Protein: {dailySummary.protein}g</p>
                         <p>Carbs: {dailySummary.carbs}g</p>
                         <p>Fat: {dailySummary.fat}g</p>
+                    </div>
+                    <div className="mt-8">
+                        <h2 className="text-2xl font-bold">This Week's Summary</h2>
+                        <p>Calories: {weeklySummary.calories}</p>
+                        <p>Protein: {weeklySummary.protein}g</p>
+                        <p>Carbs: {weeklySummary.carbs}g</p>
+                        <p>Fat: {weeklySummary.fat}g</p>
                     </div>
                     <div>
                         <h2 className="mt-8 text-2xl font-bold">Macronutrient Breakdown</h2>
@@ -126,6 +161,12 @@ export default function Profile() {
                             </PieChart>
                         </div>
                     </div>
+                    <button
+                        onClick={handleLogout}
+                        className="w-full px-4 py-2 mt-8 font-bold text-white bg-red-600 rounded-md hover:bg-red-700"
+                    >
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>

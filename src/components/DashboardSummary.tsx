@@ -58,22 +58,24 @@ export default function DashboardSummary({ mealLogs }: DashboardSummaryProps) {
     }, [mealLogs, startOfWeek])
 
     return (
-        <div className="p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center">Your Summary</h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="p-8 space-y-6 bg-white rounded-lg shadow-md text-center">
+            <h2 className="text-3xl font-bold text-gray-800">Today's Summary</h2>
+            <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <h3 className="text-xl font-bold">Today</h3>
-                    <p>Calories: {dailySummary.calories}</p>
-                    <p>Protein: {dailySummary.protein}g</p>
-                    <p>Carbs: {dailySummary.carbs}g</p>
-                    <p>Fat: {dailySummary.fat}g</p>
+                    <p className="text-lg font-semibold">Calories</p>
+                    <p className="text-2xl">{dailySummary.calories}</p>
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold">This Week</h3>
-                    <p>Calories: {weeklySummary.calories}</p>
-                    <p>Protein: {weeklySummary.protein}g</p>
-                    <p>Carbs: {weeklySummary.carbs}g</p>
-                    <p>Fat: {weeklySummary.fat}g</p>
+                    <p className="text-lg font-semibold">Protein</p>
+                    <p className="text-2xl">{dailySummary.protein}g</p>
+                </div>
+                <div>
+                    <p className="text-lg font-semibold">Carbs</p>
+                    <p className="text-2xl">{dailySummary.carbs}g</p>
+                </div>
+                <div>
+                    <p className="text-lg font-semibold">Fat</p>
+                    <p className="text-2xl">{dailySummary.fat}g</p>
                 </div>
             </div>
         </div>

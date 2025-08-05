@@ -58,7 +58,7 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
 
     return (
         <div className="p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center">Quick Log</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-800">Quick Log</h2>
             <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
