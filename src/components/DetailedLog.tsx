@@ -10,7 +10,11 @@ interface NutritionData {
     fat: number
 }
 
-export default function DetailedLog() {
+interface DetailedLogProps {
+    onMealLogged: () => void
+}
+
+export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
     const [batchDescription, setBatchDescription] = useState('')
     const [portionDescription, setPortionDescription] = useState('')
     const [nutritionData, setNutritionData] = useState<NutritionData | null>(null)
@@ -46,6 +50,7 @@ export default function DetailedLog() {
                 fat: nutrition.fat.estimate,
             }
             setNutritionData(formattedData)
+            onMealLogged()
         } catch (err: any) {
             console.error('Error in handleAnalyze:', err)
             setError(err.message)
@@ -93,7 +98,12 @@ export default function DetailedLog() {
 
             {error && <p className="text-red-500">{error}</p>}
 
-            {nutritionData && <ResultsCard data={nutritionData} />}
+            {nutritionData && (
+                <ResultsCard
+                    data={nutritionData}
+                    description={`Batch: ${batchDescription}. My portion: ${portionDescription}`}
+                />
+            )}
         </div>
     )
 }

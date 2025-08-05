@@ -10,7 +10,11 @@ interface NutritionData {
     fat: number
 }
 
-export default function QuickLog() {
+interface QuickLogProps {
+    onMealLogged: () => void
+}
+
+export default function QuickLog({ onMealLogged }: QuickLogProps) {
     const [description, setDescription] = useState('')
     const [nutritionData, setNutritionData] = useState<NutritionData | null>(null)
     const [loading, setLoading] = useState(false)
@@ -43,6 +47,7 @@ export default function QuickLog() {
                 fat: nutrition.fat.estimate,
             }
             setNutritionData(formattedData)
+            onMealLogged()
         } catch (err: any) {
             console.error('Error in handleAnalyze:', err)
             setError(err.message)
@@ -71,7 +76,9 @@ export default function QuickLog() {
 
             {error && <p className="text-red-500">{error}</p>}
 
-            {nutritionData && <ResultsCard data={nutritionData} />}
+            {nutritionData && (
+                <ResultsCard data={nutritionData} description={description} />
+            )}
         </div>
     )
 }
