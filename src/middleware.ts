@@ -60,17 +60,21 @@ export async function middleware(request: NextRequest) {
 
     // if user is not signed in and the current path is not /login or /signup, redirect the user to the login page
     if (!user && !['/login', '/signup'].includes(request.nextUrl.pathname)) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        return NextResponse.redirect(url)
     }
 
-    // if user is signed in and the current path is /login or /signup, redirect the user to the dashboard
-    if (user && ['/login', '/signup'].includes(request.nextUrl.pathname)) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+    // if user is signed in and the current path is /login, /signup, or /, redirect the user to the dashboard
+    if (user && ['/login', '/signup', '/'].includes(request.nextUrl.pathname)) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard'
+        return NextResponse.redirect(url)
     }
 
     return response
 }
 
 export const config = {
-    matcher: ['/login', '/signup', '/dashboard'],
+    matcher: ['/login', '/signup', '/dashboard', '/'],
 }
