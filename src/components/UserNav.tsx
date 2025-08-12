@@ -6,11 +6,11 @@ import Link from 'next/link'
 import { User } from '@supabase/supabase-js'
 
 export default function UserNav() {
-    const supabase = createClient()
     const [user, setUser] = useState<User | null>(null)
 
     useEffect(() => {
         const fetchUser = async () => {
+            const supabase = createClient()
             const {
                 data: { user },
             } = await supabase.auth.getUser()
@@ -18,7 +18,7 @@ export default function UserNav() {
         }
 
         fetchUser()
-    }, [supabase])
+    }, [])
 
     return (
         <div className="absolute top-4 right-4 flex items-center space-x-2">
