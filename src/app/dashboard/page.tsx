@@ -43,8 +43,10 @@ export default function Dashboard() {
                 }
 
                 setMealLogs(data)
-            } catch (err: any) {
-                setError(err.message)
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message)
+                }
             } finally {
                 setLoading(false)
             }
@@ -55,7 +57,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchMealLogs()
-    }, [supabase])
+    }, [supabase, fetchMealLogs])
 
     return (
         <div className="relative flex flex-col items-center min-h-screen bg-gray-100 py-12">

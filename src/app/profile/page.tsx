@@ -42,8 +42,10 @@ export default function Profile() {
                     }
 
                     setMealLogs(data)
-                } catch (err: any) {
-                    setError(err.message)
+                } catch (err) {
+                    if (err instanceof Error) {
+                        setError(err.message)
+                    }
                 } finally {
                     setLoading(false)
                 }

@@ -17,9 +17,12 @@ interface DashboardSummaryProps {
 }
 
 export default function DashboardSummary({ mealLogs }: DashboardSummaryProps) {
-    const today = new Date()
-    const startOfWeek = new Date(today)
-    startOfWeek.setDate(today.getDate() - today.getDay())
+    const today = useMemo(() => new Date(), [])
+    const startOfWeek = useMemo(() => {
+        const start = new Date(today)
+        start.setDate(today.getDate() - today.getDay())
+        return start
+    }, [today])
 
     const dailySummary = useMemo(() => {
         return mealLogs
@@ -38,24 +41,6 @@ export default function DashboardSummary({ mealLogs }: DashboardSummaryProps) {
                 { calories: 0, protein: 0, carbs: 0, fat: 0 }
             )
     }, [mealLogs, today])
-
-    const weeklySummary = useMemo(() => {
-        return mealLogs
-            .filter((log) => {
-                const logDate = new Date(log.created_at)
-                return logDate >= startOfWeek
-            })
-            .reduce(
-                (acc, log) => {
-                    acc.calories += log.calories
-                    acc.protein += log.protein
-                    acc.carbs += log.carbs
-                    acc.fat += log.fat
-                    return acc
-                },
-                { calories: 0, protein: 0, carbs: 0, fat: 0 }
-            )
-    }, [mealLogs, startOfWeek])
 
     return (
         <div className="p-8 space-y-6 bg-white rounded-lg shadow-md text-center">
