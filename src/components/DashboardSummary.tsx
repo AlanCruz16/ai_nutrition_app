@@ -39,7 +39,7 @@ export default function DashboardSummary({ mealLogs }: DashboardSummaryProps) {
 
     return (
         <div className="p-8 space-y-6 bg-white rounded-lg shadow-md text-center">
-            <h2 className="text-3xl font-bold text-gray-800">Today's Summary</h2>
+            <h2 className="text-3xl font-bold text-gray-800">Today&apos;s Summary</h2>
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <p className="text-lg font-semibold">Calories</p>

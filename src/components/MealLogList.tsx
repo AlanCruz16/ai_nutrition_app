@@ -59,9 +59,9 @@ export default function MealLogList({
 
     return (
         <div className="p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-3xl font-bold text-center text-gray-800">Today's Meals</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-800">Today&apos;s Meals</h2>
             {todaysLogs.length === 0 ? (
-                <p className="text-center">You haven't logged any meals today.</p>
+                <p className="text-center">You haven&apos;t  logged any meals today.</p>
             ) : (
                 <ul className="space-y-4">
                     {todaysLogs.map((log) => (

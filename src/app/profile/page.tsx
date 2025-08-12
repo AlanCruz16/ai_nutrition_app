@@ -128,14 +128,14 @@ export default function Profile() {
                     </Link>
                     <h1 className="text-3xl font-bold text-center">Your Profile</h1>
                     <div>
-                        <h2 className="text-2xl font-bold">Today's Summary</h2>
+                        <h2 className="text-2xl font-bold">Today&apos;s Summary</h2>
                         <p>Calories: {dailySummary.calories}</p>
                         <p>Protein: {dailySummary.protein}g</p>
                         <p>Carbs: {dailySummary.carbs}g</p>
                         <p>Fat: {dailySummary.fat}g</p>
                     </div>
                     <div className="mt-8">
-                        <h2 className="text-2xl font-bold">This Week's Summary</h2>
+                        <h2 className="text-2xl font-bold">This Week&apos;s Summary</h2>
                         <p>Calories: {weeklySummary.calories}</p>
                         <p>Protein: {weeklySummary.protein}g</p>
                         <p>Carbs: {weeklySummary.carbs}g</p>

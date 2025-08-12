@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import QuickLog from '@/components/QuickLog'
 import DetailedLog from '@/components/DetailedLog'
 import MealLogList from '@/components/MealLogList'
@@ -25,7 +25,7 @@ export default function Dashboard() {
     const [error, setError] = useState<string | null>(null)
     const supabase = createClient()
 
-    const fetchMealLogs = async () => {
+    const fetchMealLogs = useCallback(async () => {
         const {
             data: { user },
         } = await supabase.auth.getUser()
@@ -53,11 +53,11 @@ export default function Dashboard() {
         } else {
             setLoading(false)
         }
-    }
+    }, [supabase])
 
     useEffect(() => {
         fetchMealLogs()
-    }, [supabase, fetchMealLogs])
+    }, [fetchMealLogs])
 
     return (
         <div className="relative flex flex-col items-center min-h-screen bg-gray-100 py-12">
