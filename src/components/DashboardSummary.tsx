@@ -18,11 +18,6 @@ interface DashboardSummaryProps {
 
 export default function DashboardSummary({ mealLogs }: DashboardSummaryProps) {
     const today = useMemo(() => new Date(), [])
-    const startOfWeek = useMemo(() => {
-        const start = new Date(today)
-        start.setDate(today.getDate() - today.getDay())
-        return start
-    }, [today])
 
     const dailySummary = useMemo(() => {
         return mealLogs
