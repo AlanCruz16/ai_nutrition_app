@@ -50,8 +50,10 @@ export default function MealLogList({
             }
 
             onMealDeleted()
-        } catch (err: any) {
-            console.error(err)
+        } catch (err) {
+            if (err instanceof Error) {
+                console.error(err.message)
+            }
         }
     }
 

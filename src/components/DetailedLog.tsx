@@ -85,8 +85,10 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
             }
             setNutritionData(formattedData)
             onMealLogged()
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message)
+            }
         } finally {
             setLoading(false)
         }
@@ -111,8 +113,10 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                 setRecipes([...recipes, data[0]])
                 setShowSaveRecipe(false)
                 setRecipeName('')
-            } catch (err: any) {
-                setError(err.message)
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message)
+                }
             }
         }
     }

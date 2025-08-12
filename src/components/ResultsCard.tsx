@@ -56,8 +56,10 @@ export default function ResultsCard({
 
             setSuccess(true)
             onMealLogged()
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message)
+            }
         } finally {
             setLoading(false)
         }

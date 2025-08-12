@@ -2,13 +2,12 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { User } from '@supabase/supabase-js'
 
 export default function UserNav() {
     const supabase = createClient()
-    const [user, setUser] = useState<any>(null)
-    const router = useRouter()
+    const [user, setUser] = useState<User | null>(null)
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -20,11 +19,6 @@ export default function UserNav() {
 
         fetchUser()
     }, [supabase])
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut()
-        router.push('/login')
-    }
 
     return (
         <div className="absolute top-4 right-4 flex items-center space-x-2">
