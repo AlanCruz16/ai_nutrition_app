@@ -8,10 +8,10 @@ export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const router = useRouter()
-    const supabase = createClient()
 
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault()
+        const supabase = createClient()
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,

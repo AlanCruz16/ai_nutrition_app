@@ -24,9 +24,9 @@ export default function Dashboard() {
     const [mealLogs, setMealLogs] = useState<MealLog[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const supabase = createClient()
 
     const fetchMealLogs = useCallback(async () => {
+        const supabase = createClient()
         const {
             data: { user },
         } = await supabase.auth.getUser()
@@ -54,7 +54,7 @@ export default function Dashboard() {
         } else {
             setLoading(false)
         }
-    }, [supabase])
+    }, [])
 
     useEffect(() => {
         fetchMealLogs()
@@ -97,7 +97,6 @@ export default function Dashboard() {
                     loading={loading}
                     error={error}
                     onMealDeleted={fetchMealLogs}
-                    supabase={supabase}
                 />
             </div>
         </div>

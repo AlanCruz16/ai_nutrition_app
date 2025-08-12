@@ -10,14 +10,13 @@ interface MealLog {
     created_at: string
 }
 
-import { SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 
 interface MealLogListProps {
     mealLogs: MealLog[]
     loading: boolean
     error: string | null
     onMealDeleted: () => void
-    supabase: SupabaseClient
 }
 
 export default function MealLogList({
@@ -25,7 +24,6 @@ export default function MealLogList({
     loading,
     error,
     onMealDeleted,
-    supabase,
 }: MealLogListProps) {
     const today = new Date()
     const todaysLogs = mealLogs.filter((log) => {
@@ -42,6 +40,7 @@ export default function MealLogList({
     }
 
     const handleDelete = async (id: string) => {
+        const supabase = createClient()
         try {
             const { error } = await supabase.from('meal_logs').delete().eq('id', id)
 
