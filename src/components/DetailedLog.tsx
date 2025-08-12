@@ -30,10 +30,10 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
     const [showSaveRecipe, setShowSaveRecipe] = useState(false)
     const [recipeName, setRecipeName] = useState('')
     const [recipes, setRecipes] = useState<Recipe[]>([])
-    const supabase = createClient()
 
     useEffect(() => {
         const fetchRecipes = async () => {
+            const supabase = createClient()
             const {
                 data: { user },
             } = await supabase.auth.getUser()
@@ -53,7 +53,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
         }
 
         fetchRecipes()
-    }, [supabase])
+    }, [])
 
     const handleAnalyze = async () => {
         setLoading(true)
@@ -95,6 +95,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
     }
 
     const handleSaveRecipe = async () => {
+        const supabase = createClient()
         const {
             data: { user },
         } = await supabase.auth.getUser()

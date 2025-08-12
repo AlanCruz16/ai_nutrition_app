@@ -22,11 +22,11 @@ export default function Profile() {
     const [mealLogs, setMealLogs] = useState<MealLog[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const supabase = createClient()
     const router = useRouter()
 
     useEffect(() => {
         const fetchMealLogs = async () => {
+            const supabase = createClient()
             const {
                 data: { user },
             } = await supabase.auth.getUser()
@@ -56,7 +56,7 @@ export default function Profile() {
         }
 
         fetchMealLogs()
-    }, [supabase])
+    }, [])
 
     const dailySummary = useMemo(() => {
         const today = new Date()
@@ -115,6 +115,7 @@ export default function Profile() {
     }
 
     const handleLogout = async () => {
+        const supabase = createClient()
         await supabase.auth.signOut()
         router.push('/login')
     }
