@@ -78,15 +78,14 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
             const result = await response.json()
             const nutrition = result.nutritionalInformation
             const formattedData = {
-                calories: nutrition.calories.estimate,
-                protein: nutrition.protein.estimate,
-                carbs: nutrition.carbohydrates.estimate,
-                fat: nutrition.fat.estimate,
+                calories: Math.round(nutrition.calories.estimate),
+                protein: Math.round(nutrition.protein.estimate),
+                carbs: Math.round(nutrition.carbohydrates.estimate),
+                fat: Math.round(nutrition.fat.estimate),
             }
             setNutritionData(formattedData)
             onMealLogged()
         } catch (err: any) {
-            console.error('Error in handleAnalyze:', err)
             setError(err.message)
         } finally {
             setLoading(false)
@@ -207,6 +206,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                 <ResultsCard
                     data={nutritionData}
                     description={`Batch: ${batchDescription}\nMy portion: ${portionDescription}`}
+                    onMealLogged={onMealLogged}
                 />
             )}
         </div>

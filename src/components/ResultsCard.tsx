@@ -13,9 +13,14 @@ interface NutritionData {
 interface ResultsCardProps {
     data: NutritionData
     description: string
+    onMealLogged: () => void
 }
 
-export default function ResultsCard({ data, description }: ResultsCardProps) {
+export default function ResultsCard({
+    data,
+    description,
+    onMealLogged,
+}: ResultsCardProps) {
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -50,6 +55,7 @@ export default function ResultsCard({ data, description }: ResultsCardProps) {
             }
 
             setSuccess(true)
+            onMealLogged()
         } catch (err: any) {
             setError(err.message)
         } finally {

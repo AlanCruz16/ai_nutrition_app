@@ -51,7 +51,7 @@ export default function MealLogList({
 
             onMealDeleted()
         } catch (err: any) {
-            console.error('Error deleting meal log:', err)
+            console.error(err)
         }
     }
 

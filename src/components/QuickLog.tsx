@@ -41,15 +41,14 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
             const result = await response.json()
             const nutrition = result.nutritionalInformation
             const formattedData = {
-                calories: nutrition.calories.estimate,
-                protein: nutrition.protein.estimate,
-                carbs: nutrition.carbohydrates.estimate,
-                fat: nutrition.fat.estimate,
+                calories: Math.round(nutrition.calories.estimate),
+                protein: Math.round(nutrition.protein.estimate),
+                carbs: Math.round(nutrition.carbohydrates.estimate),
+                fat: Math.round(nutrition.fat.estimate),
             }
             setNutritionData(formattedData)
             onMealLogged()
         } catch (err: any) {
-            console.error('Error in handleAnalyze:', err)
             setError(err.message)
         } finally {
             setLoading(false)
@@ -77,7 +76,11 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
             {error && <p className="text-red-500">{error}</p>}
 
             {nutritionData && (
-                <ResultsCard data={nutritionData} description={description} />
+                <ResultsCard
+                    data={nutritionData}
+                    description={description}
+                    onMealLogged={onMealLogged}
+                />
             )}
         </div>
     )

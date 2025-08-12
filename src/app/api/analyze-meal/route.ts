@@ -54,7 +54,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data)
   } catch (error) {
-    console.error('Error analyzing meal:', error)
     return NextResponse.json(
       { error: 'Failed to analyze meal' },
       { status: 500 }
