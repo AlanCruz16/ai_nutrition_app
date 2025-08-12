@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+export const dynamic = 'force-dynamic'
 import QuickLog from '@/components/QuickLog'
 import DetailedLog from '@/components/DetailedLog'
 import MealLogList from '@/components/MealLogList'

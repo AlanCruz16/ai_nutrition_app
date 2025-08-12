@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/client'
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
 import UserNav from '@/components/UserNav'
