@@ -59,9 +59,10 @@ export async function POST(req: NextRequest) {
     const data = JSON.parse(jsonString);
 
     return NextResponse.json(data)
-  } catch {
+  } catch (error) {
+    console.error(error)
     return NextResponse.json(
-      { error: 'Failed to analyze meal' },
+      { error: 'Failed to analyze meal', details: (error as Error).message },
       { status: 500 }
     )
   }
