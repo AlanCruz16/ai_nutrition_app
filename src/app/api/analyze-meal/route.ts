@@ -3,10 +3,16 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' })
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: 'GEMINI_API_KEY is not set' },
+        { status: 500 }
+      )
+    }
     const { description } = await req.json()
 
     if (!description) {
