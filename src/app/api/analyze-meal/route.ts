@@ -39,9 +39,32 @@ export async function POST(req: NextRequest) {
       Meal: "${description}"
     `
 
-    const result = await model.generateContent(prompt)
-    const response = result.response
-    const text = await response.text()
+    let attempt = 0
+    const maxRetries = 3
+    let result
+    let response
+    let text
+
+    while (attempt < maxRetries) {
+      try {
+        result = await model.generateContent(prompt)
+        response = result.response
+        text = await response.text()
+        break
+      } catch (e) {
+        const error = e as Error
+        if (error.message.includes('503') && attempt < maxRetries - 1) {
+          attempt++
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
+        } else {
+          throw error
+        }
+      }
+    }
+
+    if (!text) {
+      throw new Error('No response text from AI');
+    }
 
     // Extract the JSON part from the response
     const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);

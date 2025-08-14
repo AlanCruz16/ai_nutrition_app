@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import ResultsCard from './ResultsCard'
+import SkeletonLoader from './SkeletonLoader'
 
 interface NutritionData {
     calories: number
@@ -75,9 +76,10 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
                 {loading ? 'Analyzing...' : 'Analyze Meal'}
             </button>
 
+            {loading && <SkeletonLoader />}
             {error && <p className="text-red-500">{error}</p>}
 
-            {nutritionData && (
+            {nutritionData && !loading && (
                 <ResultsCard
                     data={nutritionData}
                     description={description}
