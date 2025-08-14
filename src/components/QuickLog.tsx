@@ -34,11 +34,11 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
                 body: JSON.stringify({ description }),
             })
 
-            if (!response.ok) {
-                throw new Error('Failed to analyze meal')
-            }
-
             const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.details || 'Failed to analyze meal')
+            }
             const nutrition = result.nutritionalInformation
             const formattedData = {
                 calories: Math.round(nutrition.calories.estimate),
