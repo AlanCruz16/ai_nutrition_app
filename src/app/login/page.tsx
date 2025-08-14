@@ -37,6 +37,12 @@ export default function LoginPage() {
                         Login
                     </button>
                 </form>
+                <p className="text-sm text-center text-gray-600">
+                    Don't have an account?{' '}
+                    <a href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+                        Sign up
+                    </a>
+                </p>
             </div>
         </div>
     )
