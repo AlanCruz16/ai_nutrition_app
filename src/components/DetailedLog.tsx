@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ResultsCard from './ResultsCard'
 import { createClient } from '@/lib/supabase/client'
+import SkeletonLoader from './SkeletonLoader'
 
 interface NutritionData {
     calories: number
@@ -207,7 +208,9 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
 
             {error && <p className="text-red-500">{error}</p>}
 
-            {nutritionData && (
+            {loading && <SkeletonLoader />}
+
+            {nutritionData && !loading && (
                 <ResultsCard
                     data={nutritionData}
                     description={`Batch: ${batchDescription}\nMy portion: ${portionDescription}`}

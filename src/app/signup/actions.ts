@@ -17,5 +17,5 @@ export async function signUp(formData: FormData) {
         return redirect('/signup?message=Could not authenticate user')
     }
 
-    return redirect('/login?message=Check email to continue sign in process')
+    return redirect('/signup?message=Check email to continue sign in process')
 }
