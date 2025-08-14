@@ -2,21 +2,31 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-    const response = NextResponse.next({
+    let response = NextResponse.next({
         request: {
             headers: request.headers,
         },
     })
 
     const supabase = createServerClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_ANON_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
                 get(name: string) {
                     return request.cookies.get(name)?.value
                 },
                 set(name: string, value: string, options: CookieOptions) {
+                    request.cookies.set({
+                        name,
+                        value,
+                        ...options,
+                    })
+                    response = NextResponse.next({
+                        request: {
+                            headers: request.headers,
+                        },
+                    })
                     response.cookies.set({
                         name,
                         value,
@@ -24,8 +34,19 @@ export async function middleware(request: NextRequest) {
                     })
                 },
                 remove(name: string, options: CookieOptions) {
-                    response.cookies.delete({
+                    request.cookies.set({
                         name,
+                        value: '',
+                        ...options,
+                    })
+                    response = NextResponse.next({
+                        request: {
+                            headers: request.headers,
+                        },
+                    })
+                    response.cookies.set({
+                        name,
+                        value: '',
                         ...options,
                     })
                 },
@@ -33,27 +54,20 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
-
-    // if user is not signed in and the current path is not /login or /signup, redirect the user to the login page
-    if (!user && !['/login', '/signup'].includes(request.nextUrl.pathname)) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/login'
-        return NextResponse.redirect(url)
-    }
-
-    // if user is signed in and the current path is /login, /signup, or /, redirect the user to the dashboard
-    if (user && ['/login', '/signup', '/'].includes(request.nextUrl.pathname)) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/dashboard'
-        return NextResponse.redirect(url)
-    }
+    await supabase.auth.getUser()
 
     return response
 }
 
 export const config = {
-    matcher: ['/login', '/signup', '/dashboard', '/'],
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * Feel free to modify this pattern to include more paths.
+         */
+        '/((?!_next/static|_next/image|favicon.ico).*)',
+    ],
 }
