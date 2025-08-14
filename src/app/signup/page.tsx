@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { signUp } from './actions'
 import SignupMessages from '@/components/SignupMessages'
 
@@ -9,7 +10,9 @@ export default function SignupPage() {
                     <h1 className="text-3xl font-bold">Nutrition Tracker</h1>
                     <p className="text-gray-500">Create an account to get started.</p>
                 </div>
-                <SignupMessages />
+                <Suspense fallback={<div>Loading...</div>}>
+                    <SignupMessages />
+                </Suspense>
                 <form action={signUp} className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700" htmlFor="email">
