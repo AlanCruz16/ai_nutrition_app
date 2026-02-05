@@ -2,14 +2,16 @@
 
 import { useMemo } from 'react'
 
+import { Id } from '../../convex/_generated/dataModel'
+
 interface MealLog {
-    id: string
+    _id: Id<"meal_logs">
     description: string
     calories: number
     protein: number
     carbs: number
     fat: number
-    created_at: string
+    created_at: number
 }
 
 interface DashboardSummaryProps {
@@ -22,6 +24,7 @@ export default function DashboardSummary({ mealLogs }: DashboardSummaryProps) {
     const dailySummary = useMemo(() => {
         return mealLogs
             .filter((log) => {
+                // created_at is number (ms)
                 const logDate = new Date(log.created_at)
                 return logDate.toDateString() === today.toDateString()
             })

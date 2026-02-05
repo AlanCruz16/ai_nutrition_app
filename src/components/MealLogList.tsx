@@ -1,58 +1,42 @@
 'use client'
 
+import { useMutation } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+import { Id } from '../../convex/_generated/dataModel'
+
 interface MealLog {
-    id: string
+    _id: Id<"meal_logs">
+    _creationTime: number
     description: string
     calories: number
     protein: number
     carbs: number
     fat: number
-    created_at: string
+    // created_at is stored as number in Convex schema but we interpret _creationTime or custom field
+    created_at: number
 }
-
-import { createClient } from '@/lib/supabase/client'
 
 interface MealLogListProps {
     mealLogs: MealLog[]
-    loading: boolean
-    error: string | null
-    onMealDeleted: () => void
 }
 
 export default function MealLogList({
     mealLogs,
-    loading,
-    error,
-    onMealDeleted,
 }: MealLogListProps) {
+    const deleteMeal = useMutation(api.meals.deleteMeal);
+
     const today = new Date()
     const todaysLogs = mealLogs.filter((log) => {
+        // created_at in schema is number (ms)
         const logDate = new Date(log.created_at)
         return logDate.toDateString() === today.toDateString()
     })
 
-    if (loading) {
-        return <p>Loading meal logs...</p>
-    }
-
-    if (error) {
-        return <p className="text-red-500">{error}</p>
-    }
-
-    const handleDelete = async (id: string) => {
-        const supabase = createClient()
+    const handleDelete = async (id: Id<"meal_logs">) => {
         try {
-            const { error } = await supabase.from('meal_logs').delete().eq('id', id)
-
-            if (error) {
-                throw error
-            }
-
-            onMealDeleted()
+            await deleteMeal({ id });
         } catch (err) {
-            if (err instanceof Error) {
-                console.error(err.message)
-            }
+            console.error("Failed to delete meal:", err);
         }
     }
 
@@ -64,7 +48,7 @@ export default function MealLogList({
             ) : (
                 <ul className="space-y-4">
                     {todaysLogs.map((log) => (
-                        <li key={log.id} className="p-4 bg-gray-100 rounded-md relative">
+                        <li key={log._id} className="p-4 bg-gray-100 rounded-md relative">
                             <div>
                                 <p className="font-bold">{log.description}</p>
                                 <p>Calories: {log.calories}</p>
@@ -78,7 +62,7 @@ export default function MealLogList({
                                 </p>
                             </div>
                             <button
-                                onClick={() => handleDelete(log.id)}
+                                onClick={() => handleDelete(log._id)}
                                 className="absolute bottom-4 right-4 p-2 text-white bg-red-600 rounded-full hover:bg-red-700"
                             >
                                 <svg

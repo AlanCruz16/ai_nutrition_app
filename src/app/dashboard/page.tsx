@@ -1,64 +1,31 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-export const dynamic = 'force-dynamic'
+import { useState } from 'react'
 import QuickLog from '@/components/QuickLog'
 import DetailedLog from '@/components/DetailedLog'
 import MealLogList from '@/components/MealLogList'
 import DashboardSummary from '@/components/DashboardSummary'
 import UserNav from '@/components/UserNav'
-import { createClient } from '@/lib/supabase/client'
-
-interface MealLog {
-    id: string
-    description: string
-    calories: number
-    protein: number
-    carbs: number
-    fat: number
-    created_at: string
-}
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
+import { useUser } from '@clerk/nextjs'
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState('quick')
-    const [mealLogs, setMealLogs] = useState<MealLog[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
 
-    const fetchMealLogs = useCallback(async () => {
-        const supabase = createClient()
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
+    // Convex automatically handles loading/auth states
+    const mealLogs = useQuery(api.meals.getMeals)
+    const { isLoaded, isSignedIn } = useUser();
 
-        if (user) {
-            try {
-                const { data, error } = await supabase
-                    .from('meal_logs')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: false })
+    // While loading auth or data, show loading state
+    if (!isLoaded || mealLogs === undefined) {
+        return <div className="p-12 text-center">Loading...</div>
+    }
 
-                if (error) {
-                    throw error
-                }
-
-                setMealLogs(data)
-            } catch (err) {
-                if (err instanceof Error) {
-                    setError(err.message)
-                }
-            } finally {
-                setLoading(false)
-            }
-        } else {
-            setLoading(false)
-        }
-    }, [])
-
-    useEffect(() => {
-        fetchMealLogs()
-    }, [fetchMealLogs])
+    if (!isSignedIn) {
+        // Middleware should handle this, but safe fallback
+        return <div>Please log in</div>
+    }
 
     return (
         <div className="relative flex flex-col items-center min-h-screen bg-gray-100 py-12">
@@ -87,17 +54,12 @@ export default function Dashboard() {
                         </button>
                     </div>
                     {activeTab === 'quick' ? (
-                        <QuickLog onMealLogged={fetchMealLogs} />
+                        <QuickLog />
                     ) : (
-                        <DetailedLog onMealLogged={fetchMealLogs} />
+                        <DetailedLog />
                     )}
                 </div>
-                <MealLogList
-                    mealLogs={mealLogs}
-                    loading={loading}
-                    error={error}
-                    onMealDeleted={fetchMealLogs}
-                />
+                <MealLogList mealLogs={mealLogs} />
             </div>
         </div>
     )

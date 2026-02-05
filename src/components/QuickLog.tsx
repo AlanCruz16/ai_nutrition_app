@@ -11,11 +11,10 @@ interface NutritionData {
     fat: number
 }
 
-interface QuickLogProps {
-    onMealLogged: () => void
-}
-
-export default function QuickLog({ onMealLogged }: QuickLogProps) {
+// onMealLogged removed because Convex updates reactively, or we just pass handleClose logic? 
+// Actually ResultsCard calls it. We can just keep it optional or empty function if needed for UI state reset.
+// In Dashboard we removed arguments to QuickLog, so no props are passed.
+export default function QuickLog() {
     const [description, setDescription] = useState('')
     const [nutritionData, setNutritionData] = useState<NutritionData | null>(null)
     const [loading, setLoading] = useState(false)
@@ -48,7 +47,6 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
                 fat: Math.round(nutrition.fat.estimate),
             }
             setNutritionData(formattedData)
-            onMealLogged()
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)
@@ -56,6 +54,11 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleClear = () => {
+        setNutritionData(null);
+        setDescription('');
     }
 
     return (
@@ -83,7 +86,7 @@ export default function QuickLog({ onMealLogged }: QuickLogProps) {
                 <ResultsCard
                     data={nutritionData}
                     description={description}
-                    onMealLogged={onMealLogged}
+                    onMealLogged={handleClear}
                 />
             )}
         </div>

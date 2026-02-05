@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import ResultsCard from './ResultsCard'
-import { createClient } from '@/lib/supabase/client'
 import SkeletonLoader from './SkeletonLoader'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+// import { Id } from '../../convex/_generated/dataModel'
 
 interface NutritionData {
     calories: number
@@ -12,17 +14,8 @@ interface NutritionData {
     fat: number
 }
 
-interface Recipe {
-    id: string
-    name: string
-    description: string
-}
-
-interface DetailedLogProps {
-    onMealLogged: () => void
-}
-
-export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
+// Recipes are loaded via Convex now
+export default function DetailedLog() {
     const [batchDescription, setBatchDescription] = useState('')
     const [portionDescription, setPortionDescription] = useState('')
     const [nutritionData, setNutritionData] = useState<NutritionData | null>(null)
@@ -30,31 +23,10 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
     const [error, setError] = useState<string | null>(null)
     const [showSaveRecipe, setShowSaveRecipe] = useState(false)
     const [recipeName, setRecipeName] = useState('')
-    const [recipes, setRecipes] = useState<Recipe[]>([])
 
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            const supabase = createClient()
-            const {
-                data: { user },
-            } = await supabase.auth.getUser()
-
-            if (user) {
-                const { data, error } = await supabase
-                    .from('recipes')
-                    .select('*')
-                    .eq('user_id', user.id)
-
-                if (error) {
-                    console.error('Error fetching recipes:', error)
-                } else {
-                    setRecipes(data)
-                }
-            }
-        }
-
-        fetchRecipes()
-    }, [])
+    // Convex hooks
+    const recipes = useQuery(api.recipes.getRecipes) ?? []
+    const saveRecipeMutation = useMutation(api.recipes.saveRecipe)
 
     const handleAnalyze = async () => {
         setLoading(true)
@@ -72,11 +44,11 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                 body: JSON.stringify({ description: fullDescription }),
             })
 
-            if (!response.ok) {
-                throw new Error('Failed to analyze meal')
-            }
-
             const result = await response.json()
+
+            if (!response.ok) {
+                throw new Error(result.details || 'Failed to analyze meal')
+            }
             const nutrition = result.nutritionalInformation
             const formattedData = {
                 calories: Math.round(nutrition.calories.estimate),
@@ -85,7 +57,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                 fat: Math.round(nutrition.fat.estimate),
             }
             setNutritionData(formattedData)
-            onMealLogged()
+            // onMealLogged() // Removed as parent updates reactively
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)
@@ -96,31 +68,24 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
     }
 
     const handleSaveRecipe = async () => {
-        const supabase = createClient()
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
-
-        if (user) {
-            try {
-                const { data, error } = await supabase
-                    .from('recipes')
-                    .insert([{ name: recipeName, description: batchDescription, user_id: user.id }])
-                    .select()
-
-                if (error) {
-                    throw error
-                }
-
-                setRecipes([...recipes, data[0]])
-                setShowSaveRecipe(false)
-                setRecipeName('')
-            } catch (err) {
-                if (err instanceof Error) {
-                    setError(err.message)
-                }
+        try {
+            await saveRecipeMutation({
+                name: recipeName,
+                description: batchDescription,
+            })
+            setShowSaveRecipe(false)
+            setRecipeName('')
+        } catch (err) {
+            if (err instanceof Error) {
+                setError(err.message)
             }
         }
+    }
+
+    const handleClear = () => {
+        setNutritionData(null)
+        setBatchDescription('')
+        setPortionDescription('')
     }
 
     return (
@@ -134,7 +99,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                     <select
                         onChange={(e) => {
                             const selectedRecipe = recipes.find(
-                                (r) => r.id === e.target.value
+                                (r) => r._id === e.target.value
                             )
                             if (selectedRecipe) {
                                 setBatchDescription(selectedRecipe.description)
@@ -144,7 +109,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                     >
                         <option value="">-- Select a recipe --</option>
                         {recipes.map((recipe) => (
-                            <option key={recipe.id} value={recipe.id}>
+                            <option key={recipe._id} value={recipe._id}>
                                 {recipe.name}
                             </option>
                         ))}
@@ -214,7 +179,7 @@ export default function DetailedLog({ onMealLogged }: DetailedLogProps) {
                 <ResultsCard
                     data={nutritionData}
                     description={`Batch: ${batchDescription}\nMy portion: ${portionDescription}`}
-                    onMealLogged={onMealLogged}
+                    onMealLogged={handleClear}
                 />
             )}
         </div>

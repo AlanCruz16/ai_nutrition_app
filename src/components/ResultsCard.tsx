@@ -1,7 +1,8 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
+import { useMutation } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 interface NutritionData {
     calories: number
@@ -21,7 +22,8 @@ export default function ResultsCard({
     description,
     onMealLogged,
 }: ResultsCardProps) {
-    const supabase = createClient()
+    const logMeal = useMutation(api.meals.logMeal)
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
@@ -31,34 +33,23 @@ export default function ResultsCard({
         setError(null)
         setSuccess(false)
 
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
-
-        if (!user) {
-            setError('You must be logged in to log a meal.')
-            setLoading(false)
-            return
-        }
-
         try {
-            const { error } = await supabase.from('meal_logs').insert([
-                {
-                    user_id: user.id,
-                    description,
-                    ...data,
-                },
-            ])
-
-            if (error) {
-                throw error
-            }
+            await logMeal({
+                description,
+                calories: data.calories,
+                protein: data.protein,
+                carbs: data.carbs,
+                fat: data.fat,
+            })
 
             setSuccess(true)
             onMealLogged()
         } catch (err) {
+            // "Unauthenticated" error comes from backend if not logged in
             if (err instanceof Error) {
                 setError(err.message)
+            } else {
+                setError("Failed to log meal")
             }
         } finally {
             setLoading(false)
