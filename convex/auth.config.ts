@@ -1,7 +1,7 @@
 export default {
     providers: [
         {
-            domain: "https://happy-vulture-25.clerk.accounts.dev",
+            domain: process.env.CLERK_ISSUER_URL,
             applicationID: "convex",
         },
     ],

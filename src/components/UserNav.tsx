@@ -12,6 +12,7 @@ export default function UserNav() {
             {/* Optional: Show email manually if UserButton doesn't fit design, 
                  but UserButton is best practice for Clerk */}
             <span className="text-gray-600">{user.primaryEmailAddress?.emailAddress}</span>
+            <a href="/profile" className="text-gray-600 hover:text-gray-900 font-medium">My Profile</a>
             <UserButton afterSignOutUrl="/" />
         </div>
     )
